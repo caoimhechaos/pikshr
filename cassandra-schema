@@ -1,0 +1,3 @@
+create keyspace pikshr with placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy' and strategy_options = {replication_factor:1};
+use pikshr;
+create column family picture with comparator = 'AsciiType' and key_validation_class = 'BytesType' and column_metadata = [{column_name: title, validation_class: UTF8Type}, {column_name: description, validation_class: UTF8Type}, {column_name: content_type, validation_class: AsciiType}, {column_name: picture, validation_class: BytesType}, {column_name: thumbnail, validation_class: BytesType}, {column_name: owner, validation_class: AsciiType}, {column_name: alt_text, validation_class: UTF8Type}];
