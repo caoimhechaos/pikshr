@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>Overview &mdash; PikShr</title>
+    <meta name="description" content="Overview and upload page for the PikShr picture sharing service"/>
+    <meta name="robots" content="index,follow"/>
+    <script language="JavaScript" type="text/javascript">
+    function fileSelected() {
+      var file = document.getElementById('imageupload').files[0];
+      var indicator = document.getElementById('fileSize');
+
+      // Clear all child nodes of the upload indicator.
+      while (indicator.childNodes.length > 0)
+        indicator.removeChild(indicator.firstChild);
+
+      if (file) {
+        if (file.size > 1.5*1048576) {
+          indicator.appendChild(document.createTextNode(
+            (Math.round(file.size * 100 / 1048576) / 100).toString() + ' MB to upload'));
+        } else {
+          indicator.appendChild(document.createTextNode(
+            (Math.round(file.size * 100 / 1024) / 100).toString() + ' KB to upload'));
+        }
+      } else {
+        indicator.appendChild(document.createTextNode("No file selected"));
+      }
+    }
+
+    function uploadProgress(evt) {
+      var indicator = document.getElementById('progress');
+      if (evt.lengthComputable) {
+        var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+        while (indicator.childNodes.length > 0)
+          indicator.removeChild(indicator.firstChild);
+        indicator.appendChild(document.createTextNode(percentComplete.toString() + "%"));
+      } else {
+        while (indicator.childNodes.length > 0)
+          indicator.removeChild(indicator.firstChild);
+        indicator.appendChild(document.createTextNode("? %"));
+      }
+    }
+
+    function uploadComplete(evt) {
+      var indicator = document.getElementById('progress');
+      var title = document.getElementById('title');
+      var alt = document.getElementById('alt');
+      var description = document.getElementById('description');
+      var imageupload = document.getElementById('imageupload');
+      var a;
+
+      title.value = '';
+      alt.value = '';
+      description.value = '';
+      imageupload.value = '';
+
+      while (indicator.childNodes.length > 0)
+        indicator.removeChild(indicator.firstChild);
+
+      a = document.createElement('a');
+      a.href = "/" + this.response;
+      a.appendChild(document.createTextNode('Done! View your new picture here.'))
+      indicator.appendChild(a);
+    }
+
+    function uploadFailed(evt) {
+      var indicator = document.getElementById('progress');
+      while (indicator.childNodes.length > 0)
+        indicator.removeChild(indicator.firstChild);
+      indicator.appendChild(document.createTextNode("Upload failed!"));
+    }
+
+    function uploadCanceled(evt) {
+      var indicator = document.getElementById('progress');
+      while (indicator.childNodes.length > 0)
+        indicator.removeChild(indicator.firstChild);
+      indicator.appendChild(document.createTextNode("Upload canceled!"));
+    }
+
+    function uploadFile() {
+      var xhr = new XMLHttpRequest();
+      var fd = new FormData();
+      var title = document.getElementById('title');
+      var alt = document.getElementById('alt');
+      var description = document.getElementById('description');
+      var imageupload = document.getElementById('imageupload');
+
+      fd.append("outform", "json");
+      fd.append("title", title.value);
+      fd.append("alt", alt.value);
+      fd.append("description", description.value);
+      fd.append("imageupload", imageupload.files[0]);
+
+      // Register event listeners.
+      xhr.upload.addEventListener("progress", uploadProgress, false);
+      xhr.addEventListener("load", uploadComplete, false);
+      xhr.addEventListener("error", uploadFailed, false);
+      xhr.addEventListener("abort", uploadCanceled, false);
+
+      xhr.responseType = "text";
+
+      xhr.open("POST", "/");
+      xhr.send(fd);
+    }
+    </script>
+  </head>
+  <body>
+  	<h1>PikShr picture sharing</h1>
+    <div id="uploadedId">
+{{if .UploadedId}}
+      Your picture is now available under <a href="/{{.UploadedId}}">{{.UploadedId}}</a>.
+{{end}}
+    </div>
+{{if .User}}
+    <p>Upload a new picture:</p>
+    <!-- form id="imageform" action="/" method="POST" enctype="multipart/form-data" -->
+    <form id="imageform" enctype="multipart/form-data">
+      <input id="outform" type="hidden" name="outform" value="html"/>
+      <fieldset>
+        <legend>Image to upload:</legend>
+        <input id="imageupload" type="file" name="imageupload" size="50"
+               maxlength="20971520" accept="image/*" onchange="fileSelected();" />
+      </fieldset>
+      <fieldset>
+        <legend>Title</legend>
+        <input id="title" type="text" name="title" value="" required="required"
+               size="100" placeholder="Title to display"/>
+      </fieldset>
+      <fieldset>
+        <legend>Alternative Text</legend>
+        <input id="alt" type="text" name="alt" value="" size="100"
+               placeholder="Alternative text (describe the picture)"/>
+      </fieldset>
+      <fieldset>
+        <legend>Description</legend>
+        <textarea id="description" name="description"
+                  placeholder="Long description of the picture" rows="6"
+                  cols="100"></textarea>
+      </fieldset>
+      <fieldset>
+        <legend>Upload</legend>
+        <input type="button" onclick="uploadFile();" value="Upload!" />
+        <!-- input type="submit" value="Upload without AJAX!" / -->
+      </fieldset>
+    </form>
+    <div id="fileSize"></div>
+    <div id="progress"></div>
+{{else}}
+    <p>In order to upload pictures, please <a href="/login?redirect_uri=%2f">log in</a>.
+{{end}}
+  </body>
+</html>

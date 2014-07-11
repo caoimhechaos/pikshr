@@ -21,3 +21,8 @@ _testmain.go
 
 *.exe
 *.test
+
+ca.crt
+pikshr
+pikshr.crt
+pikshr.key
