@@ -41,7 +41,7 @@ import (
 
 func main() {
 	var app_name, cert_file, key_file, ca_bundle, authserver string
-	var bind, dbserver, dbname, skel_path, upload_path string
+	var bind, dbserver, dbname, skel_path, upload_path, static_path string
 	var skel, upload *template.Template
 	var auth *ancientauth.Authenticator
 	var db *PikShrDB
@@ -62,6 +62,8 @@ func main() {
 		"Path to the skeleton template to use for displaying the pictures")
 	flag.StringVar(&upload_path, "upload-template", "upload.html",
 		"Path to the upload template which is essentially the main page")
+	flag.StringVar(&static_path, "static-path", ".",
+		"Path to the required static files for the web interface")
 
 	flag.StringVar(&bind, "bind", "[::]:8080",
 		"host:port pair to bind the web server to")
@@ -92,6 +94,10 @@ func main() {
 		log.Fatal("Error connecting to database ", dbname, " at ",
 			dbserver, ": ", err)
 	}
+
+	http.Handle("/css/", http.FileServer(http.Dir(static_path)))
+	http.Handle("/js/", http.FileServer(http.Dir(static_path)))
+	http.Handle("/fonts/", http.FileServer(http.Dir(static_path)))
 
 	http.Handle("/", &WebPikShrService{
 		auth:   auth,
