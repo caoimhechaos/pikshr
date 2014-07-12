@@ -139,7 +139,6 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		mf.Close()
 	}
 
-	log.Print(req.Form)
 	if req.FormValue("outform") == "json" {
 		rw.Write([]byte(wmd.UploadedId))
 	} else {
