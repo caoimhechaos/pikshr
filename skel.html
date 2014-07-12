@@ -4,12 +4,31 @@
     <title>{{.Title}} &mdash; PikShr</title>
     <meta name="description" content="{{.Description}}"/>
     <meta name="robots" content="index,follow"/>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
+    <script language="JavaScript" type="text/javascript" src="/js/jquery.min.js">
+    </script>
+    <script language="JavaScript" type="text/javascript" src="/js/bootstrap.min.js">
+    </script>
   </head>
   <body>
-  	<h1>{{.Title}}</h1>
-  	<img src="/{{.Id}}.png" alt="{{.AltText}}" title="{{.Title}}"/>
-  	<p>
-  	  {{.Description}}
-  	</p>
+  	<div class="page-header text-center">
+  	  <h1>{{.Title}}</h1>
+  	</div>
+  	<div class="container-fluid">
+  	  <div class="col-md-10">
+  	    <a href="/{{.Id}}.png">
+	  		<img src="/{{.Id}}.png" alt="{{.AltText}}" title="{{.Title}}"
+	  			 class="img-responsive" style="max-height: 85%;"/>
+	  	</a>
+  	  </div>
+  	  <div class="col-md-2">
+        <div class="panel panel-default">
+  	      <div class="panel-body">
+  	  	    {{.Description}}
+  	  	  </div>
+  	  	</div>
+  	  </div>
+  	</div>
   </body>
 </html>
