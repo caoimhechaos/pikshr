@@ -4,6 +4,13 @@
     <title>Overview &mdash; PikShr</title>
     <meta name="description" content="Overview and upload page for the PikShr picture sharing service"/>
     <meta name="robots" content="index,follow"/>
+
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css"/>
+    <script language="JavaScript" type="text/javascript" src="/js/jquery.min.js">
+    </script>
+    <script language="JavaScript" type="text/javascript" src="/js/bootstrap.min.js">
+    </script>
+
     <script language="JavaScript" type="text/javascript">
     function fileSelected() {
       var file = document.getElementById('imageupload').files[0];
@@ -41,11 +48,12 @@
     }
 
     function uploadComplete(evt) {
-      var indicator = document.getElementById('progress');
+      var indicator = document.getElementById('uploadedId');
       var title = document.getElementById('title');
       var alt = document.getElementById('alt');
       var description = document.getElementById('description');
       var imageupload = document.getElementById('imageupload');
+      var fsize = document.getElementById('fileSize');
       var a;
 
       title.value = '';
@@ -55,11 +63,17 @@
 
       while (indicator.childNodes.length > 0)
         indicator.removeChild(indicator.firstChild);
+      while (fileSize.childNodes.length > 0)
+        fileSize.removeChild(fileSize.firstChild);
 
       a = document.createElement('a');
       a.href = "/" + this.response;
-      a.appendChild(document.createTextNode('Done! View your new picture here.'))
+      a.appendChild(document.createTextNode('View your new picture here.'));
+      indicator.appendChild(document.createTextNode('Done! '));
       indicator.appendChild(a);
+      $(indicator).removeClass("hidden");
+      $(indicator).addClass("show");
+      $('#uploadModal').modal('hide');
     }
 
     function uploadFailed(evt) {
@@ -104,46 +118,67 @@
     </script>
   </head>
   <body>
-  	<h1>PikShr picture sharing</h1>
-    <div id="uploadedId">
-{{if .UploadedId}}
-      Your picture is now available under <a href="/{{.UploadedId}}">{{.UploadedId}}</a>.
-{{end}}
-    </div>
+  	<h1>PikShr <small>picture sharing</small></h1>
+    <div id="uploadedId" class="alert alert-info hidden"></div>
 {{if .User}}
-    <p>Upload a new picture:</p>
-    <!-- form id="imageform" action="/" method="POST" enctype="multipart/form-data" -->
-    <form id="imageform" enctype="multipart/form-data">
-      <input id="outform" type="hidden" name="outform" value="html"/>
-      <fieldset>
-        <legend>Image to upload:</legend>
-        <input id="imageupload" type="file" name="imageupload" size="50"
-               maxlength="20971520" accept="image/*" onchange="fileSelected();" />
-      </fieldset>
-      <fieldset>
-        <legend>Title</legend>
-        <input id="title" type="text" name="title" value="" required="required"
-               size="100" placeholder="Title to display"/>
-      </fieldset>
-      <fieldset>
-        <legend>Alternative Text</legend>
-        <input id="alt" type="text" name="alt" value="" size="100"
-               placeholder="Alternative text (describe the picture)"/>
-      </fieldset>
-      <fieldset>
-        <legend>Description</legend>
-        <textarea id="description" name="description"
-                  placeholder="Long description of the picture" rows="6"
-                  cols="100"></textarea>
-      </fieldset>
-      <fieldset>
-        <legend>Upload</legend>
-        <input type="button" onclick="uploadFile();" value="Upload!" />
-        <!-- input type="submit" value="Upload without AJAX!" / -->
-      </fieldset>
-    </form>
-    <div id="fileSize"></div>
-    <div id="progress"></div>
+   <div id="progress" class="alert alert-info hidden"></div>
+
+   <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
+
+   <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog"
+        aria-labelledby="uploadModalLabel" aria-hidden="true">
+     <div class="modal-dialog">
+       <div class="modal-content">
+         <div class="modal-header">
+           <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+           <h4 class="modal-title" id="uploadModalLabel">Upload new picture</h4>
+         </div>
+         <div class="modal-body">
+           <form id="imageform" enctype="multipart/form-data" role="form"
+                 class="form-horizontal">
+             <input id="outform" type="hidden" name="outform" value="html"/>
+             <div class="form-group">
+               <label for="imageupload" class="col-sm-2 control-label">Image to upload:</label>
+               <div class="col-sm-8">
+                 <input id="imageupload" type="file" name="imageupload"
+                        maxlength="20971520" accept="image/*" onchange="fileSelected();"
+                        class="form-control" />
+               </div>
+               <div id="fileSize" class="col-sm-2"></div>
+             </div>
+             <div class="form-group">
+               <label for="title" class="col-sm-2 control-label">Title</label>
+               <div class="col-sm-10">
+                 <input id="title" type="text" name="title" value="" required="required"
+                        class="form-control" placeholder="Title to display"/>
+               </div>
+             </div>
+             <div class="form-group">
+               <label for="alt" class="col-sm-2 control-label">Alternative Text</label>
+               <div class="col-sm-10">
+                 <input id="alt" type="text" name="alt" value="" class="form-control"
+                        placeholder="Alternative text (describe the picture)"/>
+               </div>
+             </div>
+             <div class="form-group">
+               <label for="description" class="col-sm-2 control-label">Description</label>
+               <div class="col-sm-10">
+                 <textarea id="description" name="description" rows="5"
+                           placeholder="Long description of the picture"
+                           class="form-control"></textarea>
+               </div>
+             </div>
+           </form>
+         </div>
+         <div class="modal-footer">
+           <div class="col-sm-offset-2 col-sm-10">
+             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+             <button type="button" onclick="uploadFile();"class="btn btn-primary">Upload!</button>
+           </div>
+         </div>
+       </div>
+     </div>
+   </div>
 {{else}}
     <p>In order to upload pictures, please <a href="/login?redirect_uri=%2f">log in</a>.
 {{end}}
