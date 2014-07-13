@@ -66,8 +66,15 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		http.NotFound(rw, req)
 		return
 	} else if strings.HasSuffix(req.RequestURI, ".png") {
-		var id = req.RequestURI[1 : len(req.RequestURI)-4]
-		res, err = w.db.GetPicture(id)
+		var id string
+
+		if strings.HasSuffix(req.RequestURI, ".thumb.png") {
+			id = req.RequestURI[1 : len(req.RequestURI)-10]
+			res, err = w.db.GetThumbnail(id)
+		} else {
+			id = req.RequestURI[1 : len(req.RequestURI)-4]
+			res, err = w.db.GetPicture(id)
+		}
 		if err == Err_ImageNotFound {
 			// TODO(caoimhe): this wants to be a template.
 			http.NotFound(rw, req)
