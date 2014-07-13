@@ -170,6 +170,21 @@ func (p *PikShrDB) GetMetadata(id string) (*Picture, error) {
 	return p.getPictureColumn(id, "")
 }
 
+func makeMutation(name string, value []byte, now time.Time) (ret *cassandra.Mutation) {
+	var cos = cassandra.NewColumnOrSuperColumn()
+	var col = cassandra.NewColumn()
+
+	col.Name = []byte(name)
+	col.Value = value
+	col.Timestamp = now.UnixNano()
+
+	cos.Column = col
+
+	ret = cassandra.NewMutation()
+	ret.ColumnOrSupercolumn = cos
+	return
+}
+
 // Insert the given picture and metadata into the database.
 // Also, generate a thumbnail.
 func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
@@ -178,6 +193,7 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	var ue *cassandra.UnavailableException
 	var te *cassandra.TimedOutException
 	var mmap = make(map[string]map[string][]*cassandra.Mutation)
+	var mlist []*cassandra.Mutation
 	var now = time.Now()
 	var img, thumbnail image.Image
 	var buf *bytes.Buffer = new(bytes.Buffer)
@@ -203,19 +219,13 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	keystr = hex.EncodeToString(key[:])
 
 	mmap[string(key[:])] = make(map[string][]*cassandra.Mutation)
-	mmap[string(key[:])]["picture"] = make([]*cassandra.Mutation, 0)
+	mlist = make([]*cassandra.Mutation, 0)
 
-	mutation = cassandra.NewMutation()
-	mutation.ColumnOrSupercolumn = cassandra.NewColumnOrSuperColumn()
-	mutation.ColumnOrSupercolumn.Column = cassandra.NewColumn()
-	mutation.ColumnOrSupercolumn.Column.Name = []byte("picture")
-	mutation.ColumnOrSupercolumn.Column.Value = buf.Bytes()
-	mutation.ColumnOrSupercolumn.Column.Timestamp = now.UnixNano()
-	mmap[string(key[:])]["picture"] = append(mmap[string(key[:])]["picture"],
-		mutation)
+	mutation = makeMutation("picture", buf.Bytes(), now)
+	mlist = append(mlist, mutation)
 
 	// Create a thumbnail and save it too.
-	thumbnail = resize.Thumbnail(180, 180, img, resize.Lanczos3)
+	thumbnail = resize.Thumbnail(140, 180, img, resize.Lanczos3)
 	err = png.Encode(buf, thumbnail)
 	if err != nil {
 		return keystr, err
@@ -230,42 +240,20 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	}
 	thumbnail = nil
 
-	mutation = cassandra.NewMutation()
-	mutation.ColumnOrSupercolumn = cassandra.NewColumnOrSuperColumn()
-	mutation.ColumnOrSupercolumn.Column = cassandra.NewColumn()
-	mutation.ColumnOrSupercolumn.Column.Name = []byte("thumbnail")
-	mutation.ColumnOrSupercolumn.Column.Value = buf.Bytes()
-	mutation.ColumnOrSupercolumn.Column.Timestamp = now.UnixNano()
-	mmap[string(key[:])]["picture"] = append(mmap[string(key[:])]["picture"],
-		mutation)
+	mutation = makeMutation("thumbnail", buf.Bytes(), now)
+	mlist = append(mlist, mutation)
 
 	// Now for some metadata.
-	mutation = cassandra.NewMutation()
-	mutation.ColumnOrSupercolumn = cassandra.NewColumnOrSuperColumn()
-	mutation.ColumnOrSupercolumn.Column = cassandra.NewColumn()
-	mutation.ColumnOrSupercolumn.Column.Name = []byte("title")
-	mutation.ColumnOrSupercolumn.Column.Value = []byte(pic.Title)
-	mutation.ColumnOrSupercolumn.Column.Timestamp = now.UnixNano()
-	mmap[string(key[:])]["picture"] = append(mmap[string(key[:])]["picture"],
-		mutation)
+	mutation = makeMutation("title", []byte(pic.Title), now)
+	mlist = append(mlist, mutation)
 
-	mutation = cassandra.NewMutation()
-	mutation.ColumnOrSupercolumn = cassandra.NewColumnOrSuperColumn()
-	mutation.ColumnOrSupercolumn.Column = cassandra.NewColumn()
-	mutation.ColumnOrSupercolumn.Column.Name = []byte("description")
-	mutation.ColumnOrSupercolumn.Column.Value = []byte(pic.Description)
-	mutation.ColumnOrSupercolumn.Column.Timestamp = now.UnixNano()
-	mmap[string(key[:])]["picture"] = append(mmap[string(key[:])]["picture"],
-		mutation)
+	mutation = makeMutation("description", []byte(pic.Description), now)
+	mlist = append(mlist, mutation)
 
-	mutation = cassandra.NewMutation()
-	mutation.ColumnOrSupercolumn = cassandra.NewColumnOrSuperColumn()
-	mutation.ColumnOrSupercolumn.Column = cassandra.NewColumn()
-	mutation.ColumnOrSupercolumn.Column.Name = []byte("owner")
-	mutation.ColumnOrSupercolumn.Column.Value = []byte(creator)
-	mutation.ColumnOrSupercolumn.Column.Timestamp = now.UnixNano()
-	mmap[string(key[:])]["picture"] = append(mmap[string(key[:])]["picture"],
-		mutation)
+	mutation = makeMutation("owner", []byte(creator), now)
+	mlist = append(mlist, mutation)
+
+	mmap[string(key[:])]["picture"] = mlist
 
 	// Now: write it!
 	ire, ue, te, err = p.db.AtomicBatchMutate(mmap, cassandra.ConsistencyLevel_QUORUM)
