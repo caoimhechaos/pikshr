@@ -225,7 +225,7 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	mlist = append(mlist, mutation)
 
 	// Create a thumbnail and save it too.
-	thumbnail = resize.Thumbnail(140, 180, img, resize.Lanczos3)
+	thumbnail = resize.Thumbnail(200, 200, img, resize.Lanczos3)
 	err = png.Encode(buf, thumbnail)
 	if err != nil {
 		return keystr, err
@@ -251,6 +251,9 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	mlist = append(mlist, mutation)
 
 	mutation = makeMutation("owner", []byte(creator), now)
+	mlist = append(mlist, mutation)
+
+	mutation = makeMutation("alt_text", []byte(pic.AltText), now)
 	mlist = append(mlist, mutation)
 
 	mmap[string(key[:])]["picture"] = mlist
