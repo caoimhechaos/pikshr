@@ -11,6 +11,7 @@
     <script language="JavaScript" type="text/javascript" src="/js/bootstrap.min.js">
     </script>
 
+{{if .User}}
     <script language="JavaScript" type="text/javascript">
     function fileSelected() {
       var file = document.getElementById('imageupload').files[0];
@@ -116,13 +117,43 @@
       xhr.send(fd);
     }
     </script>
+{{end}}
   </head>
   <body>
     <div class="page-header text-center">
       <h1>PikShr <small>picture sharing</small></h1>
     </div>
-    <div id="uploadedId" class="alert alert-info hidden"></div>
+    <div id="all-images-carousel" class="carousel slide pull-right" data-ride="carousel">
+      <ol class="carousel-indicators">
+{{range $index, $pic := .AllPics}}
+{{if $index|eq 0}}
+        <li data-target="#all-images-carousel" data-slide-to="0" class="active"></li>
+{{else}}
+        <li data-target="#all-images-carousel" data-slide-to="{{$index}}"></li>
+{{end}}
+{{end}}
+      </ol>
+
+      <div class="carousel-inner">
+{{range $index, $pic := .AllPics}}
+        <div class="item{{if $index|eq 0}} active{{end}}">
+          <img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+          <div class="carousel-caption">
+            {{$pic.Title}}
+          </div>
+        </div>
+{{end}}
+      </div>
+ 
+      <a class="left carousel-control" href="#all-images-carousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+      </a>
+      <a class="right carousel-control" href="#all-images-carousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+      </a>
+   </div>
 {{if .User}}
+    <div id="uploadedId" class="alert alert-info hidden"></div>
    <div id="progress" class="alert alert-info hidden"></div>
 
    <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
