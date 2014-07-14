@@ -42,15 +42,18 @@ import (
 )
 
 type WebPikShrService struct {
-	auth   *ancientauth.Authenticator
-	db     *PikShrDB
-	skel   *template.Template
-	upload *template.Template
+	auth     *ancientauth.Authenticator
+	db       *PikShrDB
+	skel     *template.Template
+	upload   *template.Template
+	num_pics int32
 }
 
 type webMetadata struct {
 	User       string
 	UploadedId string
+	OwnPics    []*Picture
+	AllPics    []*Picture
 }
 
 // Either allow people to upload new pictures, or serve existing ones.
@@ -148,11 +151,24 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 
 	if req.FormValue("outform") == "json" {
 		rw.Write([]byte(wmd.UploadedId))
-	} else {
-		err = w.upload.Execute(rw, &wmd)
+		return
+	}
+	if len(wmd.User) > 0 {
+		wmd.OwnPics, err = w.db.GetRecentPics(wmd.User, w.num_pics)
 		if err != nil {
-			rw.Write([]byte(err.Error()))
-			log.Print("Unable to execute upload template: ", err)
+			log.Print("Error determining the most recent pics of ",
+				wmd.User, ": ", err)
 		}
+	}
+	wmd.AllPics, err = w.db.GetRecentPics("", w.num_pics)
+	if err != nil {
+		log.Print("Error determining the most recent pics of ",
+			wmd.User, ": ", err)
+	}
+
+	err = w.upload.Execute(rw, &wmd)
+	if err != nil {
+		rw.Write([]byte(err.Error()))
+		log.Print("Unable to execute upload template: ", err)
 	}
 }

@@ -271,3 +271,82 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	}
 	return keystr, err
 }
+
+// List the num most recent pictures for the given user. If the user name
+// is empty, list the most recent pictures for all users.
+func (p *PikShrDB) GetRecentPics(user string, num int32) (ret []*Picture, err error) {
+	var cp *cassandra.ColumnParent = cassandra.NewColumnParent()
+	var pred *cassandra.SlicePredicate = cassandra.NewSlicePredicate()
+	var rng *cassandra.KeyRange = cassandra.NewKeyRange()
+	var ks []*cassandra.KeySlice
+	var slice *cassandra.KeySlice
+	var ire *cassandra.InvalidRequestException
+	var ue *cassandra.UnavailableException
+	var te *cassandra.TimedOutException
+
+	cp.ColumnFamily = "picture"
+	pred.ColumnNames = [][]byte{
+		[]byte("title"), []byte("description"), []byte("content_type"),
+		[]byte("alt_text"),
+	}
+	rng.StartKey = make([]byte, 0)
+	rng.EndKey = make([]byte, 0)
+	rng.Count = num
+
+	if len(user) > 0 {
+		var indexexpr = cassandra.NewIndexExpression()
+
+		indexexpr.ColumnName = []byte("owner")
+		indexexpr.Op = cassandra.IndexOperator_EQ
+		indexexpr.Value = []byte(user)
+
+		rng.RowFilter = make([]*cassandra.IndexExpression, 0)
+		rng.RowFilter = append(rng.RowFilter, indexexpr)
+	}
+
+	ks, ire, ue, te, err = p.db.GetRangeSlices(
+		cp, pred, rng, cassandra.ConsistencyLevel_ONE)
+	if ire != nil {
+		err = errors.New(ire.Why)
+		return
+	}
+	if ue != nil {
+		err = errors.New("Unavailable")
+		return
+	}
+	if te != nil {
+		err = errors.New("Timed out")
+		return
+	}
+	if err != nil {
+		return
+	}
+
+	ret = make([]*Picture, 0)
+
+	for _, slice = range ks {
+		var pic *Picture = new(Picture)
+		var scol *cassandra.ColumnOrSuperColumn
+
+		pic.Id = hex.EncodeToString(slice.Key)
+
+		for _, scol = range slice.Columns {
+			var col = scol.Column
+			var cname string = string(col.Name)
+
+			if cname == "title" {
+				pic.Title = string(col.Value)
+			} else if cname == "description" {
+				pic.Description = string(col.Value)
+			} else if cname == "content_type" {
+				pic.ContentType = string(col.Value)
+			} else if cname == "alt_text" {
+				pic.AltText = string(col.Value)
+			}
+		}
+
+		ret = append(ret, pic)
+	}
+
+	return
+}
