@@ -158,6 +158,9 @@
           <span class="glyphicon glyphicon-chevron-right"></span>
         </a>
      </div>
+{{if .User}}
+     <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
+{{end}}
    </div>
 {{end}}
    <p class="lead">
@@ -179,8 +182,6 @@
 {{if .User}}
    <div id="uploadedId" class="alert alert-info hidden"></div>
    <div id="progress" class="alert alert-info hidden"></div>
-
-   <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
 
    <div class="modal fade" id="uploadModal" tabindex="-1" role="dialog"
         aria-labelledby="uploadModalLabel" aria-hidden="true">
