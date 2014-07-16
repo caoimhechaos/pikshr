@@ -41,6 +41,7 @@ import (
 	_ "image/gif"
 	_ "image/jpeg"
 	"image/png"
+	"sync"
 	"time"
 
 	"github.com/nfnt/resize"
@@ -48,7 +49,8 @@ import (
 
 // Database access routines for the image database.
 type PikShrDB struct {
-	db *cassandra.RetryCassandraClient
+	db      *cassandra.RetryCassandraClient
+	db_lock sync.Mutex
 }
 
 type Picture struct {
@@ -116,8 +118,10 @@ func (p *PikShrDB) getPictureColumn(id, column string) (*Picture, error) {
 		return nil, err
 	}
 
+	p.db_lock.Lock()
 	r, ire, ue, te, err = p.db.GetSlice(
 		key, cp, pred, cassandra.ConsistencyLevel_ONE)
+	p.db_lock.Unlock()
 	if ire != nil {
 		return nil, errors.New(ire.Why)
 	}
@@ -260,6 +264,8 @@ func (p *PikShrDB) InsertPicture(pic *Picture, creator string) (string, error) {
 	mmap[string(key[:])]["picture"] = mlist
 
 	// Now: write it!
+	p.db_lock.Lock()
+	defer p.db_lock.Unlock()
 	ire, ue, te, err = p.db.AtomicBatchMutate(mmap, cassandra.ConsistencyLevel_QUORUM)
 	if ire != nil {
 		return keystr, errors.New(ire.Why)
@@ -305,8 +311,10 @@ func (p *PikShrDB) GetRecentPics(user string, num int32) (ret []*Picture, err er
 		rng.RowFilter = append(rng.RowFilter, indexexpr)
 	}
 
+	p.db_lock.Lock()
 	ks, ire, ue, te, err = p.db.GetRangeSlices(
 		cp, pred, rng, cassandra.ConsistencyLevel_ONE)
+	p.db_lock.Unlock()
 	if ire != nil {
 		err = errors.New(ire.Why)
 		return
