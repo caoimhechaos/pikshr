@@ -123,37 +123,61 @@
     <div class="page-header text-center">
       <h1>PikShr <small>picture sharing</small></h1>
     </div>
-    <div id="all-images-carousel" class="carousel slide pull-right" data-ride="carousel" style="height: 200px; width: 200px;">
-      <ol class="carousel-indicators">
-{{range $index, $pic := .AllPics}}
+{{if .OwnPics}}
+    <div class="pull-right">
+      <h2>Your pictures</h2>
+      <div id="own-images-carousel" class="carousel slide" data-ride="carousel"
+           style="height: 200px; width: 200px;">
+        <ol class="carousel-indicators">
+{{range $index, $pic := .OwnPics}}
 {{if $index|eq 0}}
-        <li data-target="#all-images-carousel" data-slide-to="0" class="active"></li>
+          <li data-target="#own-images-carousel" data-slide-to="0" class="active"></li>
 {{else}}
-        <li data-target="#all-images-carousel" data-slide-to="{{$index}}"></li>
+          <li data-target="#own-images-carousel" data-slide-to="{{$index}}"></li>
 {{end}}
 {{end}}
-      </ol>
+        </ol>
 
-      <div class="carousel-inner">
-{{range $index, $pic := .AllPics}}
-        <div class="item{{if $index|eq 0}} active{{end}}">
-          <img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
-          <div class="carousel-caption">
-            {{$pic.Title}}
+        <div class="carousel-inner">
+{{range $index, $pic := .OwnPics}}
+          <div class="item{{if $index|eq 0}} active{{end}}">
+            <img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+            <div class="carousel-caption">
+              {{$pic.Title}}
+            </div>
           </div>
-        </div>
 {{end}}
-      </div>
+        </div>
  
-      <a class="left carousel-control" href="#all-images-carousel" role="button" data-slide="prev">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-      </a>
-      <a class="right carousel-control" href="#all-images-carousel" role="button" data-slide="next">
-        <span class="glyphicon glyphicon-chevron-right"></span>
-      </a>
+        <a class="left carousel-control" href="#own-images-carousel" role="button"
+           data-slide="prev">
+          <span class="glyphicon glyphicon-chevron-left"></span>
+        </a>
+        <a class="right carousel-control" href="#own-images-carousel" role="button"
+           data-slide="next">
+          <span class="glyphicon glyphicon-chevron-right"></span>
+        </a>
+     </div>
+   </div>
+{{end}}
+   <p class="lead">
+    Here are some pictures shared by people on this service.
+   </p>
+   <div class="row">
+{{range $index, $pic := .AllPics}}
+     <div class="col-sm-6 col-md-4">
+      <div class="thumbnail">
+        <img data-src="holder.js/200x200" src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+        <div class="caption">
+          <h3>{{$pic.Title}}</h3>
+          <p>{{$pic.Description}}</p>
+        </div>
+      </div>
+     </div>
+{{end}}
    </div>
 {{if .User}}
-    <div id="uploadedId" class="alert alert-info hidden"></div>
+   <div id="uploadedId" class="alert alert-info hidden"></div>
    <div id="progress" class="alert alert-info hidden"></div>
 
    <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
