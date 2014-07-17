@@ -43,7 +43,7 @@ import (
 func main() {
 	var app_name, cert_file, key_file, ca_bundle, authserver string
 	var bind, dbserver, dbname, skel_path, upload_path, static_path string
-	var num_pics int
+	var num_pics, num_own int
 	var skel, upload *template.Template
 	var auth *ancientauth.Authenticator
 	var db *PikShrDB
@@ -74,8 +74,10 @@ func main() {
 	flag.StringVar(&dbname, "cassandra-dbname", "pikshr",
 		"Name of the Cassandra keyspace the images etc. are stored in")
 
-	flag.IntVar(&num_pics, "pics-per-page", 8,
+	flag.IntVar(&num_pics, "pics-per-page", 32,
 		"Number of pictures to display on the home page")
+	flag.IntVar(&num_own, "own-pics-per-page", 8,
+		"Number of _own_ pictures to display on the home page")
 
 	flag.Parse()
 
@@ -110,6 +112,7 @@ func main() {
 		skel:     skel,
 		upload:   upload,
 		num_pics: int32(num_pics),
+		num_own:  int32(num_own),
 	})
 	err = http.ListenAndServe(bind, nil)
 	if err != nil {
