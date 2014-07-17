@@ -47,6 +47,7 @@ type WebPikShrService struct {
 	skel     *template.Template
 	upload   *template.Template
 	num_pics int32
+	num_own  int32
 }
 
 type webMetadata struct {
@@ -154,7 +155,7 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 		return
 	}
 	if len(wmd.User) > 0 {
-		wmd.OwnPics, err = w.db.GetRecentPics(wmd.User, w.num_pics)
+		wmd.OwnPics, err = w.db.GetRecentPics(wmd.User, w.num_own)
 		if err != nil {
 			log.Print("Error determining the most recent pics of ",
 				wmd.User, ": ", err)
