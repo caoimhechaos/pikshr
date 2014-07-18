@@ -1,0 +1,133 @@
+.\" Hey, EMACS: -*- nroff -*-
+.TH PIKSHR "1" "Jul 2014" "pikshr"
+.SH NAME
+pikshr \- Cassandra backed picture sharing web application
+.SH SYNOPSIS
+.TP
+.B pikshr
+\fI[\-\-app\-name=name]\fR
+\fI[\-\-auth\-server=host]\fR
+\fI[\-\-bind=address]\fR
+\fI[\-\-ca=path]\fR
+\fI[\-\-cassandra\-dbname=name]\fR
+\fI[\-\-cassandra\-server=host]\fR
+\fI[\-\-cert=path]\fR
+\fI[\-\-own\-pics\-per\-page=number]\fR
+\fI[\-\-pics\-per\-page=number]\fR
+\fI[\-\-priv=path]\fR
+\fI[\-\-skelelton\-template=path]\fR
+\fI[\-\-static\-path=path]\fR
+\fI[\-\-upload\-template=path]\fR
+.SH DESCRIPTION
+.PP
+.B pikshr
+is a standalone web server implementing a picture sharing application with a
+.I Cassandra
+database backend.
+.SH OPTIONS
+.TP
+\fB\-\-app\-name=name\fR
+Define the application name to be presented to the
+.IR ancient\-login\-service (1)
+service (see also
+.IR \-\-auth\-server ).
+.TP
+\fB\-\-auth\-server=host\fR
+Use the
+.IR ancient\-login\-service (1)
+service running on the given
+.IR host .
+The host may contain a port specification as required. As a protocol,
+.I https
+will always be used.
+.TP
+\fB\-\-bind=address\fR
+Bind the server to the given address.
+This should be a host:port pair.
+.TP
+\fB\-\-ca=path\fR
+Use the certificate file at the given path to verify peer certificates
+(e.g. on the login token).
+.TP
+\fB\-\-cassandra\-dbname=name\fR
+Use the Cassandra keyspace with the given name for storing uploaded pictures.
+.TP
+\fB\-\-cassandra\-server=host\fR
+Use the Cassandra server at the given host (or host:port) for storage.
+The server should have a keyspace with the name from
+.I \-\-cassandra\-dbname
+and be configured as described in the
+.I cassandra-schema
+file.
+.TP
+\fB\-\-cert=path\fR
+.TP
+\fB\-\-priv=path\fR 
+Use the certificate and key stored at the specified paths for signing
+and encryption operations (such as the login cookie).
+.TP
+\fB\-\-help\fR
+Display the usage instructions for
+.BR pikshr .
+.TP
+\fB\-\-own\-pics\-per\-page=number\fR
+.TP
+\fB\-\-pics\-per\-page=number\fR
+Set the number of all/own pictures to be displayed to
+.IR number .
+.TP
+\fB\-\-skelelton\-template=path\fR
+.TP
+\fB\-\-upload\-template=path\fR
+Indicate the path where the HTML template files for
+.B pikshr
+can be found. This should point to the picture display skeleton page and the
+upload/picture overview template, respectively.
+.TP
+\fB\-\-static\-path=path\fR
+Indicate the path where static files are stored. The subdirectories
+.IR /css/ ,
+.I /js/
+and
+.I /fonts/
+will be servied from this directory.
+.SH ENVIRONMENT
+No environment variables are currently honored.
+.SH AUTHOR
+.B pikshr
+was written by Caoimhe Chaos.
+.SH "REPORTING BUGS"
+Please file any bug in the ditz issue tracker contained in the
+.B pikshr
+repository at
+.I http://git.ancient-solutions.com/golang/pikshr.git
+.SH COPYRIGHT
+.PP
+Copyright \(co 2014 Caoimhe Chaos
+.PP
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:
+.PP
+.IP \[bu] 2
+Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+.IP \[bu] 2
+Redistributions in binary form must reproduce the above copyright notice, this
+list of conditions and the following disclaimer in the documentation and/or
+other materials provided with the distribution.
+.IP \[bu] 2
+Neither the name of Ancient Solutions nor the name of its contributors may be
+used to endorse or promote products derived from this software without specific
+prior written permission.
+.PP
+THIS SOFTWARE IS PROVIDED BY ANCIENT SOLUTIONS AND CONTRIBUTORS ``AS IS'' AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
