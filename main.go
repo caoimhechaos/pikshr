@@ -52,19 +52,21 @@ func main() {
 		"Application name to present to the authentication server")
 	flag.StringVar(&cert_file, "cert", "pikshr.crt",
 		"Service certificate for PikShr")
-	flag.StringVar(&key_file, "priv", "pikshr.key",
+	flag.StringVar(&key_file, "key", "pikshr.key",
 		"Private serivce key for PikShr")
-	flag.StringVar(&ca_bundle, "ca", "ca.crt",
+	flag.StringVar(&ca_bundle, "cacert", "ca.crt",
 		"Path to CA certificates to authenticate the login service")
 	flag.StringVar(&authserver, "auth-server", "login.ancient-solutions.com",
 		"Host name of the authentication service to use")
 
-	flag.StringVar(&skel_path, "skelelton-template", "skel.html",
-		"Path to the skeleton template to use for displaying the pictures")
-	flag.StringVar(&upload_path, "upload-template", "upload.html",
-		"Path to the upload template which is essentially the main page")
 	flag.StringVar(&static_path, "static-path", ".",
 		"Path to the required static files for the web interface")
+	flag.StringVar(&skel_path, "skeleton-template", "",
+		"Path to the skeleton template to use for displaying the "+
+			"pictures. Default: skel.html in static_path")
+	flag.StringVar(&upload_path, "upload-template", "",
+		"Path to the upload template which is essentially the main "+
+			"page. Default: upload.html in skel_path")
 
 	flag.StringVar(&bind, "bind", "[::]:8080",
 		"host:port pair to bind the web server to")
@@ -79,6 +81,13 @@ func main() {
 		"Number of _own_ pictures to display on the home page")
 
 	flag.Parse()
+
+	if skel_path == "" {
+		upload_path = skel_path + "/skel.html"
+	}
+	if upload_path == "" {
+		upload_path = static_path + "/upload.html"
+	}
 
 	skel, err = template.ParseFiles(skel_path)
 	if err != nil {
