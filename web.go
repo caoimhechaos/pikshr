@@ -149,6 +149,9 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			}
 		}
 		mf.Close()
+	} else if req.FormValue("ensure") == "authenticated" {
+		w.auth.RequestAuthorization(rw, req)
+		return
 	}
 
 	if req.FormValue("outform") == "json" {
