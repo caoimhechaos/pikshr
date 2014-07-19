@@ -2,3 +2,9 @@
 # PIKSHR_FLAGS specifies the flags to pass to the pikshr binary.
 #
 PIKSHR_FLAGS=""
+
+#
+# PIKSHR_STATIC_DIR specifies the directory with templates and static content
+# to be shared by pikshr.
+#
+PIKSHR_STATIC_DIR="/usr/share/pikshr/htdocs"
