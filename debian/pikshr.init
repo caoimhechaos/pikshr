@@ -54,7 +54,11 @@ restart|force-reload)
 	log_daemon_msg "Restarting $DESC" "$NAME"
 	kill $(cat "/var/run/${NAME}.pid")
 	start_daemon /usr/bin/run-as-daemon -l =logger	\
-		-p "/var/run/${NAME}.pid" -- $DAEMON $PIKSHR_FLAGS
+		-p "/var/run/${NAME}.pid" -- $DAEMON 	\
+		--skelelton-template="$PIKSHR_STATIC_DIR/skel.html" \
+		--upload-template="$PIKSHR_STATIC_DIR/upload.html" \
+		--static-path="$PIKSHR_STATIC_DIR"	\
+		$PIKSHR_FLAGS
 	echo "."
 	;;
 status)
