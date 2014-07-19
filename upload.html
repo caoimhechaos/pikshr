@@ -141,7 +141,7 @@
         <div class="carousel-inner">
 {{range $index, $pic := .OwnPics}}
           <div class="item{{if $index|eq 0}} active{{end}}">
-            <img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+		  <a href="/{{$pic.Id}}"><img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/></a>
             <div class="carousel-caption">
               {{$pic.Title}}
             </div>
@@ -162,7 +162,12 @@
      <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
 {{end}}
    </div>
+{{else}}
+{{if .User}}
+   <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
 {{end}}
+{{end}}
+{{if .AllPics}}
    <p class="lead">
     Here are some pictures shared by people on this service.
    </p>
@@ -170,7 +175,9 @@
 {{range $index, $pic := .AllPics}}
      <div class="col-sm-6 col-md-4">
       <div class="thumbnail">
-        <img data-src="holder.js/200x200" src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+	<a href="/{{$pic.Id}}">
+          <img data-src="holder.js/200x200" src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+	</a>
         <div class="caption">
           <h3>{{$pic.Title}}</h3>
           <p>{{$pic.Description}}</p>
@@ -179,6 +186,7 @@
      </div>
 {{end}}
    </div>
+{{end}}
 {{if .User}}
    <div id="uploadedId" class="alert alert-info hidden"></div>
    <div id="progress" class="alert alert-info hidden"></div>
