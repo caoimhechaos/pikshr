@@ -141,7 +141,7 @@
         <div class="carousel-inner">
 {{range $index, $pic := .OwnPics}}
           <div class="item{{if $index|eq 0}} active{{end}}">
-            <img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+		  <a href="/{{$pic.Id}}"><img src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/></a>
             <div class="carousel-caption">
               {{$pic.Title}}
             </div>
@@ -175,7 +175,9 @@
 {{range $index, $pic := .AllPics}}
      <div class="col-sm-6 col-md-4">
       <div class="thumbnail">
-        <img data-src="holder.js/200x200" src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+	<a href="/{{$pic.Id}}">
+          <img data-src="holder.js/200x200" src="/{{$pic.Id}}.thumb.png" title="{{$pic.Title}}" alt="{{$pic.AltText}}"/>
+	</a>
         <div class="caption">
           <h3>{{$pic.Title}}</h3>
           <p>{{$pic.Description}}</p>
