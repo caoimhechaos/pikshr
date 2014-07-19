@@ -1,0 +1,21 @@
+Description: Import carousel, alert and modal functionality by hand.
+ Debians bootstrap is too old to handle those correctly.
+Author: Caoimhe Chaos <caoimhechaos@protonmail.com>
+Forwarded: not-needed
+Last-Update: 2014-07-19
+
+--- pikshr-0.1a.orig/upload.html
++++ pikshr-0.1a/upload.html
+@@ -10,6 +10,12 @@
+     </script>
+     <script language="JavaScript" type="text/javascript" src="/js/bootstrap.min.js">
+     </script>
++    <script language="JavaScript" type="text/javascript" src="/js/bootstrap-alert.min.js">
++    </script>
++    <script language="JavaScript" type="text/javascript" src="/js/bootstrap-carousel.min.js">
++    </script>
++    <script language="JavaScript" type="text/javascript" src="/js/bootstrap-modal.min.js">
++    </script>
+ 
+ {{if .User}}
+     <script language="JavaScript" type="text/javascript">
