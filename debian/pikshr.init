@@ -38,7 +38,7 @@ start)
 		log_daemon_msg "Starting $DESC" "$NAME"
 		start_daemon /usr/bin/run-as-daemon -l =logger	\
 			-p "/var/run/${NAME}.pid" -- $DAEMON	\
-			--skelelton-template="$PIKSHR_STATIC_DIR/skel.html" \
+			--skeleton-template="$PIKSHR_STATIC_DIR/skel.html" \
 			--upload-template="$PIKSHR_STATIC_DIR/upload.html" \
 			--static-path="$PIKSHR_STATIC_DIR"	\
 			$PIKSHR_FLAGS
@@ -55,7 +55,7 @@ restart|force-reload)
 	kill $(cat "/var/run/${NAME}.pid")
 	start_daemon /usr/bin/run-as-daemon -l =logger	\
 		-p "/var/run/${NAME}.pid" -- $DAEMON 	\
-		--skelelton-template="$PIKSHR_STATIC_DIR/skel.html" \
+		--skeleton-template="$PIKSHR_STATIC_DIR/skel.html" \
 		--upload-template="$PIKSHR_STATIC_DIR/upload.html" \
 		--static-path="$PIKSHR_STATIC_DIR"	\
 		$PIKSHR_FLAGS
