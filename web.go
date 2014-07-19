@@ -65,17 +65,17 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 	var res *Picture
 	var err error
 
-	if req.RequestURI == "/favicon.ico" {
+	if req.URL.Path == "/favicon.ico" {
 		http.NotFound(rw, req)
 		return
-	} else if strings.HasSuffix(req.RequestURI, ".png") {
+	} else if strings.HasSuffix(req.URL.Path, ".png") {
 		var id string
 
-		if strings.HasSuffix(req.RequestURI, ".thumb.png") {
-			id = req.RequestURI[1 : len(req.RequestURI)-10]
+		if strings.HasSuffix(req.URL.Path, ".thumb.png") {
+			id = req.URL.Path[1 : len(req.URL.Path)-10]
 			res, err = w.db.GetThumbnail(id)
 		} else {
-			id = req.RequestURI[1 : len(req.RequestURI)-4]
+			id = req.URL.Path[1 : len(req.URL.Path)-4]
 			res, err = w.db.GetPicture(id)
 		}
 		if err == Err_ImageNotFound {
@@ -103,16 +103,16 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			log.Print("Error writing out image ", id, ": ", err)
 		}
 		return
-	} else if req.RequestURI != "/" {
+	} else if req.URL.Path != "/" {
 		var md *Picture
-		md, err = w.db.GetMetadata(req.RequestURI[1:])
+		md, err = w.db.GetMetadata(req.URL.Path[1:])
 		if err == Err_ImageNotFound {
 			// TODO(tonnerre): this wants to be a template.
 			http.NotFound(rw, req)
 			return
 		}
 		if err != nil {
-			log.Print("Unable to fetch metadata for ", req.RequestURI[1:],
+			log.Print("Unable to fetch metadata for ", req.URL.Path[1:],
 				":", err)
 			// TODO(tonnerre): this wants to be a template.
 			rw.WriteHeader(http.StatusInternalServerError)
@@ -128,6 +128,11 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 	}
 
 	wmd.User = w.auth.GetAuthenticatedUser(req)
+	if wmd.User == "" && req.FormValue("ensure") == "authenticated" {
+		w.auth.RequestAuthorization(rw, req)
+		return
+	}
+
 	mf, mfh, err = req.FormFile("imageupload")
 	if err != nil {
 		log.Print("Unable to retrieve uploaded file: ", err)
@@ -148,9 +153,6 @@ func (w *WebPikShrService) ServeHTTP(rw http.ResponseWriter, req *http.Request) 
 			}
 		}
 		mf.Close()
-	} else if req.FormValue("ensure") == "authenticated" {
-		w.auth.RequestAuthorization(rw, req)
-		return
 	}
 
 	if req.FormValue("outform") == "json" {
