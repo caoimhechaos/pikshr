@@ -1,3 +1,10 @@
+pikshr (0.1a-1) unstable; urgency=low
+
+  * Fixed the situation where pikshr comes up with an empty state.
+
+ -- Caoimhe Chaos <caoimhechaos@protonmail.com>  Sat, 19 Jul 2014 03:47:33 +0200
+
+
 pikshr (0.1-1) unstable; urgency=low
 
   * Initial release
