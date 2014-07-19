@@ -162,7 +162,12 @@
      <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
 {{end}}
    </div>
+{{else}}
+{{if .User}}
+   <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
 {{end}}
+{{end}}
+{{if .AllPics}}
    <p class="lead">
     Here are some pictures shared by people on this service.
    </p>
@@ -179,6 +184,7 @@
      </div>
 {{end}}
    </div>
+{{end}}
 {{if .User}}
    <div id="uploadedId" class="alert alert-info hidden"></div>
    <div id="progress" class="alert alert-info hidden"></div>
