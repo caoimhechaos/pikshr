@@ -1,0 +1,4 @@
+#
+# PIKSHR_FLAGS specifies the flags to pass to the pikshr binary.
+#
+PIKSHR_FLAGS=""

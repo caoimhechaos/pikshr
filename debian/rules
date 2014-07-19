@@ -1,0 +1,20 @@
+#!/usr/bin/make -f
+
+# Uncomment this to turn on verbose mode.
+export DH_VERBOSE=1
+
+# DH_GOPKG is the upstream path which you would normally “go get”.
+# Using it allows us to build applications without patching locations.
+export DH_GOPKG := github.com/caoimhechaos/pikshr
+
+override_dh_auto_install:
+	install -o root -g 0 -m 0555 -d \
+		$(CURDIR)/debian/pikshr/usr/share/pikshr/htdocs
+	install -o root -g 0 -m 0444 $(CURDIR)/skel.html \
+		$(CURDIR)/debian/pikshr/usr/share/pikshr/htdocs
+	install -o root -g 0 -m 0444 $(CURDIR)/upload.html \
+		$(CURDIR)/debian/pikshr/usr/share/pikshr/htdocs
+	dh_auto_install -O--buildsystem=golang
+
+%:
+	dh $@ --buildsystem=golang --with=golang
