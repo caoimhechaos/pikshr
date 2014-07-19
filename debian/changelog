@@ -1,3 +1,10 @@
+pikshr (0.1.1-1) unstable; urgency=medium
+
+  * Handle authentication requests in a way which shouldn't lead to an
+    endless redirect.
+
+ -- Caoimhe Chaos <caoimhechaos@protonmail.com>  Sat, 19 Jul 2014 16:42:20 +0200
+
 pikshr (0.1a-2) unstable; urgency=low
 
   * Fixed typo in init script.
