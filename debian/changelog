@@ -1,3 +1,9 @@
+pikshr (0.1.2-1) unstable; urgency=medium
+
+  * Another fix for logins; this time it actually works!
+
+ -- Caoimhe Chaos <caoimhechaos@protonmail.com>  Sat, 19 Jul 2014 19:07:21 +0200
+
 pikshr (0.1.1-1) unstable; urgency=medium
 
   * Handle authentication requests in a way which shouldn't lead to an
