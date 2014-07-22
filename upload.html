@@ -159,12 +159,12 @@
         </a>
      </div>
 {{if .User}}
-     <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
+     <button class="btn btn-primary" onclick="$('#uploadModal').modal('toggle');">Upload picture</button>
 {{end}}
    </div>
 {{else}}
 {{if .User}}
-   <button class="btn btn-primary" data-toggle="modal" data-target="#uploadModal">Upload picture</button>
+   <button class="btn btn-primary" onclick="$('#uploadModal').modal('toggle');">Upload picture</button>
 {{end}}
 {{end}}
 {{if .AllPics}}
